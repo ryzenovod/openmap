@@ -2,71 +2,63 @@
 
 Внутренний backend-first проект медицинской геоаналитики.
 
-## Что есть в репозитории
+## Быстрый запуск (Docker Compose)
 
-### Backend
-- FastAPI API (`/health`, imports, dictionaries, territories, cases, aggregates)
-- Слои данных `staging` / `core` / `mart`
-- Alembic миграции
-- Seed-скрипты словарей
-- MVP importer CSV
-- Тесты (`pytest`)
+1) Перед запуском (особенно после изменения `docker-compose.yml`) очистите старые сервисы и orphan-контейнеры:
 
-### Frontend
-- Отдельное приложение в `frontend/` (TypeScript + React + Vite + Leaflet)
-- MVP страницы: карта, графики, список cases
+```bash
+docker compose down --remove-orphans
+```
 
----
-
-## Режим 1: запуск одной командой через Docker Compose (рекомендуется)
+2) Поднимите стек:
 
 ```bash
 docker compose up --build
 ```
 
-После запуска:
+После старта:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8000
-- Health endpoint: http://localhost:8000/health
-- PostgreSQL на хосте: `localhost:5433` (в контейнерной сети backend подключается к `db:5432`)
+- Health: http://localhost:8000/health
 
-### Примечание для Apple Silicon (M1/M2/M3)
-
-Если у вас warning про platform mismatch для образов, запустите compose так:
-
-```bash
-DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up --build
-```
-
-Используйте это только при необходимости; на большинстве окружений текущий запуск работает без дополнительных флагов.
+> В текущем compose база данных **не публикуется на хост**. Backend подключается к БД внутри compose-сети по адресу `db:5432`.
 
 ---
 
-## Режим 2: ручной запуск backend/frontend для разработки
+## Что сделано для более устойчивого startup API
 
-### 1) Поднять только БД в Docker
+`api` теперь стартует в таком порядке:
+1. wait-loop на DNS-резолв `db`;
+2. wait-loop на TCP/DB соединение с Postgres;
+3. `alembic upgrade head`;
+4. запуск `uvicorn`.
+
+Это уменьшает флаки при старте, когда БД уже поднялась как контейнер, но ещё не готова принимать подключения.
+
+---
+
+## Как запускать в ручном режиме для разработки
+
+### Backend локально + БД в Docker
 
 ```bash
+# 1) поднять только БД
 docker compose up -d db
-```
 
-БД будет доступна с хоста по `localhost:5433`.
-
-### 2) Запустить backend локально
-
-```bash
+# 2) backend локально
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
 pip install -e .[dev]
 
-export OPENMAP_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5433/openmap
+# ВАЖНО: если запускаете backend не в compose, db:5432 недоступен с хоста.
+# Нужен локальный PostgreSQL или временный override compose с пробросом порта.
 make migrate
 make seed
 make run
 ```
 
-### 3) Запустить frontend локально
+### Frontend локально
 
 ```bash
 cd frontend
@@ -77,15 +69,53 @@ npm run dev
 
 ---
 
+## Troubleshooting
+
+### 1) Orphan containers
+
+Симптомы: неожиданные ошибки старта после изменений compose-сервисов.
+
+Решение:
+
+```bash
+docker compose down --remove-orphans
+docker compose up --build
+```
+
+### 2) Конфликт порта на хосте
+
+Симптомы: `Bind for 0.0.0.0:8000 failed` или аналогично для `5173`.
+
+Решение:
+- освободить порт занятым процессом;
+- либо изменить publish-порт в `docker-compose.yml` для соответствующего сервиса.
+
+### 3) `failed to resolve host 'db'`
+
+Причина: сервис `api` запускается вне compose-сети или сеть compose в неконсистентном состоянии.
+
+Решение:
+1. Убедиться, что `api` запущен через `docker compose up`.
+2. Выполнить полную перезагрузку стека:
+
+```bash
+docker compose down --remove-orphans
+docker compose up --build
+```
+
+3. Если backend запускается локально (не в контейнере), использовать доступный хост БД (не `db`).
+
+---
+
 ## Команды разработки
 
 ### Backend
 ```bash
-make lint      # ruff + black --check
-make test      # pytest
-make ci        # compile + lint + tests
-make migrate   # alembic upgrade head
-make seed      # загрузка словарей
+make lint
+make test
+make ci
+make migrate
+make seed
 ```
 
 ### Frontend
@@ -96,13 +126,3 @@ npm run test
 npm run build
 npm run dev
 ```
-
----
-
-## Что не входит в текущий scope
-- production auth
-- forecasting
-- AI
-- background jobs
-- внешние интеграции
-- production deployment/hardening
