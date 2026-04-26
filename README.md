@@ -1,4 +1,4 @@
-# Medical Geo Analytics Platform
+# Медгеосистема
 
 Backend + Frontend MVP (iteration 5).
 
