@@ -1,4 +1,4 @@
-# Medical Geo Analytics Platform
+# Медгеосистема
 
 Backend внутренней медицинской геоаналитической системы (итерация 3 MVP).
 
