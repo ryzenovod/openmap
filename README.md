@@ -1,63 +1,75 @@
 # Medical Geo Analytics Platform
 
-Backend skeleton для внутренней медицинской геоаналитической системы (первая итерация MVP).
+Backend внутренней медицинской геоаналитической системы (итерация 2 MVP).
 
-## Что реализовано в этой итерации
-- FastAPI skeleton (`app/main.py`)
-- Endpoint `GET /health`
-- SQLAlchemy 2.x Base и engine/session scaffolding
-- Alembic конфигурация
-- Initial migration:
-  - `CREATE EXTENSION IF NOT EXISTS postgis`
-  - создание schema: `staging`, `core`, `mart`
-- Dockerfile для API
-- `docker-compose.yml` для API + PostgreSQL/PostGIS
+## Реализовано
+- FastAPI backend + `GET /health`
+- SQLAlchemy модели для `staging` и `core`
+- Alembic migrations:
+  - `20260426_0001`: PostGIS + schemas
+  - `20260426_0002`: таблицы staging/core
+- Seed scripts:
+  - `legacy_assets/dictionaries/mkb10Codes.csv`
+  - `legacy_assets/dictionaries/territories.csv`
+  - `legacy_assets/dictionaries/populations.csv`
+  - справочники статусов (`gdu/cv/mbt/found/case_type/location_role`)
+- Importer MVP для synthetic CSV:
+  - import batch + raw rows
+  - validation/date normalization
+  - dictionary mapping
+  - conservative dedup v0.1
+  - row-level errors
+- API endpoints:
+  - `POST /api/v1/imports/cases`
+  - `GET /api/v1/imports`
+  - `GET /api/v1/dictionaries/mkb10`
+  - `GET /api/v1/territories`
+  - `GET /api/v1/territories/tree`
+  - `GET /api/v1/cases`
+  - `GET /api/v1/cases/{id}`
+- Tests:
+  - importer/date normalization/dictionary mapping/dedup
+  - API tests for `/health`, `/territories`, `/imports`
 
-## Что пока **не** реализовано
-- importer CSV
-- seed scripts
-- business API (`/api/v1/cases`, `/api/v1/territories`, aggregates)
+## Пока не реализовано
+- map aggregates
+- chart aggregates
 - frontend
-
-## Структура проекта
-- `app/` — FastAPI приложение и DB foundation
-- `alembic/` — миграции
-- `docs/` — предметная документация и reference
-- `legacy_assets/dictionaries/` — legacy словари (reference only)
-- `samples/csv/` — synthetic примеры CSV
+- auth provider
+- forecasting
+- AI
 
 ## Быстрый старт
 ```bash
 docker compose up --build
 ```
 
-После старта:
-- API: http://localhost:8000
-- Healthcheck: http://localhost:8000/health
+API будет доступен на `http://localhost:8000`.
 
-## Локальный запуск без Docker
+## Локальная разработка
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install -e .
+pip install -e .[dev]
 
-# указать OPENMAP_DATABASE_URL при необходимости
+# применить миграции
 alembic upgrade head
+
+# загрузить словари
+python -m app.scripts.seed
+
+# запустить API
 uvicorn app.main:app --reload
 ```
 
-## Миграции
-Создать новую миграцию:
+## Импорт synthetic CSV
 ```bash
-alembic revision -m "message"
+curl -X POST "http://localhost:8000/api/v1/imports/cases" \
+  -F "file=@samples/csv/cases_sample.csv"
 ```
 
-Применить миграции:
+## Тесты
 ```bash
-alembic upgrade head
+pytest
 ```
-
-## Важно
-- Не коммитить реальные медицинские данные и секреты.
-- Legacy используется только как reference для словарей/семантики полей.

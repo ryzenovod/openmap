@@ -1,15 +1,13 @@
-# Schema overview
+# Schema overview (iteration 2)
 
 ## Data layers
 
 ### staging
-Слой сырого импорта:
 - stg_import_batch
 - stg_case_row
 - stg_file_mapping
 
 ### core
-Нормализованные сущности:
 - dict_mkb10
 - dict_territory_type
 - dict_case_status_gdu
@@ -27,8 +25,4 @@
 - case_location
 
 ### mart
-Агрегаты:
-- mart_case_map_daily
-- mart_case_map_monthly
-- mart_chart_yearly
-- mart_chart_structure
+- not implemented in iteration 2
