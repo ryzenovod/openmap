@@ -1,4 +1,4 @@
-# API endpoints
+# API endpoints (iteration 2)
 
 ## System
 - GET /health
@@ -18,7 +18,7 @@
 - GET /api/v1/cases
 - GET /api/v1/cases/{id}
 
-## Aggregates
-- GET /api/v1/map/aggregate
-- GET /api/v1/charts/yearly
-- GET /api/v1/charts/structure
+## Not in this iteration
+- map aggregates
+- chart aggregates
+- frontend/auth/forecasting/AI
