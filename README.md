@@ -1,4 +1,4 @@
-# Medical Geo Analytics Platform
+# Медгеосистема
 
 Внутренний backend-first проект медицинской геоаналитики.
 
