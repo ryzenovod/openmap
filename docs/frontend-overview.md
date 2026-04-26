@@ -1,26 +1,26 @@
-# Frontend overview (iteration 5 MVP)
+# Frontend overview (итерация MVP)
 
-Frontend app lives in `frontend/` and is intentionally minimal.
+Frontend находится в `frontend/` и специально остаётся минимальным.
 
-## Stack
+## Технологии
 - TypeScript
 - React + Vite
 - React Router
 - Leaflet / react-leaflet
 
-## Pages
-- `/` map page:
-  - header + sidebar filter panel + map + summary panel
+## Страницы
+- `/` (карта):
+  - header + sidebar/filter panel + map + summary
   - backend health status
-  - map aggregate data from backend
+  - данные `GET /api/v1/map/aggregate`
 - `/charts`:
   - yearly dynamics
-  - structure snippets (MKB, age groups)
+  - structure sections
 - `/cases`:
-  - cases table
-  - pagination + sorting
-  - details page `/cases/:id`
+  - таблица cases
+  - пагинация + сортировка
+  - переход на `/cases/:id`
 
-## Runtime config
+## Конфигурация
 - `VITE_API_BASE_URL`
 - `VITE_API_ROLE`

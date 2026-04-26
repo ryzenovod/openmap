@@ -1,6 +1,15 @@
-# OpenMap Frontend MVP
+# Frontend MVP (OpenMap)
 
-## Quick start
+Минимальный frontend для работы с текущим backend API.
+
+## Стек
+- TypeScript
+- React
+- Vite
+- React Router
+- Leaflet (`react-leaflet`)
+
+## Быстрый запуск
 
 ```bash
 npm install
@@ -8,12 +17,25 @@ cp .env.example .env
 npm run dev
 ```
 
-## Scripts
-- `npm run dev` - start dev server
-- `npm run build` - production build
-- `npm run lint` - eslint check
-- `npm run test` - vitest scaffold
+Приложение будет доступно на http://localhost:5173.
 
-## Backend connection
-Frontend expects backend on `VITE_API_BASE_URL` (default `http://localhost:8000`).
-Set optional role header with `VITE_API_ROLE`.
+## Скрипты
+- `npm run dev` — dev сервер с hot reload
+- `npm run build` — production build
+- `npm run lint` — eslint
+- `npm run test` — vitest scaffold
+
+## Переменные окружения
+Файл `.env`:
+
+- `VITE_API_BASE_URL=http://localhost:8000`
+- `VITE_API_ROLE=viewer`
+
+## Запуск в составе полного стека
+Из корня репозитория:
+
+```bash
+docker compose up --build
+```
+
+В этом режиме frontend также запускается в dev-контейнере с volume mount для кода.
