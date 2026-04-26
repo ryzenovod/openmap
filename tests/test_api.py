@@ -62,3 +62,22 @@ def test_mkb10_and_cases_endpoints(client, db_session) -> None:
         case_id = cases.json()["data"][0]["id"]
         detail = client.get(f"/api/v1/cases/{case_id}")
         assert detail.status_code == 200
+
+
+def test_cors_preflight_smoke(client) -> None:
+    origin = "http://localhost:5173"
+    for path in [
+        "/health",
+        "/api/v1/map/aggregate",
+        "/api/v1/charts/yearly",
+        "/api/v1/cases",
+    ]:
+        response = client.options(
+            path,
+            headers={
+                "Origin": origin,
+                "Access-Control-Request-Method": "GET",
+            },
+        )
+        assert response.status_code == 200
+        assert response.headers.get("access-control-allow-origin") == origin

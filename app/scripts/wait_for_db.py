@@ -22,7 +22,10 @@ def wait_for_dns() -> None:
             socket.gethostbyname(DB_HOST)
             return
         except Exception as exc:
-            print(f"[wait-dns] host '{DB_HOST}' not resolvable ({exc}), retry {attempt}/{DNS_TIMEOUT_SECONDS}")
+            print(
+                f"[wait-dns] host '{DB_HOST}' not resolvable ({exc}), "
+                f"retry {attempt}/{DNS_TIMEOUT_SECONDS}"
+            )
             time.sleep(1)
 
     sys.exit(f"db DNS resolution failed for host '{DB_HOST}' after {DNS_TIMEOUT_SECONDS}s")

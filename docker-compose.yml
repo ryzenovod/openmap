@@ -34,7 +34,7 @@ services:
       timeout: 5s
       retries: 10
     command: >
-      sh -c "python -m app.scripts.wait_for_db && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+      sh -eu -c "python -m app.scripts.wait_for_db; alembic upgrade head; exec uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
   frontend:
     image: node:20-alpine
