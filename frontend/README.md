@@ -1,25 +1,16 @@
-# Frontend MVP (OpenMap)
+# Frontend (русский интерфейс для врачей и аналитиков)
 
-Минимальный frontend для работы с backend API.
+Frontend переведён на русский язык и переработан в более современный, сдержанный UI.
 
-## Стек
-- TypeScript
-- React
-- Vite
-- React Router
-- Leaflet (`react-leaflet`)
+## Что изменено в этой итерации
 
-## Режим 1: запуск одной командой вместе со всем стеком
+- Полная русификация пользовательского интерфейса.
+- Локализация через `react-i18next` (`src/i18n.ts`), тексты вынесены из компонентов.
+- Обновлён layout: верхняя навигация, панель фильтров, карта, правая панель сводки, виджеты.
+- Убраны developer-style формулировки и технический бейдж backend из обычного режима.
+- Добавлены понятные пустые состояния и русские сообщения ошибок.
 
-Из корня репозитория:
-
-```bash
-docker compose up --build
-```
-
-После запуска frontend доступен на http://localhost:5173.
-
-## Режим 2: ручной запуск frontend для разработки
+## Запуск
 
 ```bash
 npm install
@@ -27,21 +18,44 @@ cp .env.example .env
 npm run dev
 ```
 
-Frontend будет доступен на http://localhost:5173.
+## Debug mode
 
-### Требования к backend в ручном режиме
+Включается через `.env`:
 
-Frontend ожидает backend по `VITE_API_BASE_URL` (по умолчанию `http://localhost:8000`).
-Если backend запущен на другом адресе — измените `.env`.
+```env
+VITE_DEBUG_MODE=true
+```
 
-## Скрипты
-- `npm run dev` — dev сервер с hot reload
-- `npm run build` — production build
-- `npm run lint` — eslint
-- `npm run test` — vitest scaffold
+В debug-режиме показывается статус backend в хедере.
 
-## Переменные окружения
-Файл `.env`:
+## Как работает локализация
 
-- `VITE_API_BASE_URL=http://localhost:8000`
-- `VITE_API_ROLE=viewer`
+- Инициализация: `src/i18n.ts`
+- Подключение: `src/main.tsx`
+- Использование: `useTranslation()` в компонентах/страницах
+
+Сейчас активен русский язык (`ru`) как основной.
+
+## Legacy tiles
+
+Можно подключить legacy подложку через:
+
+```env
+VITE_LEGACY_TILE_URL=http://localhost:8080/tiles/{z}/{x}/{y}.png
+```
+
+Если переменная пуста, используется OpenStreetMap.
+
+## Что нужно для полноценной тематической карты
+
+Для реального choropleth/границ нужны территориальные геоданные (GeoJSON/polygons).
+
+Если геометрии нет, UI честно показывает состояние:
+
+> «Карта готова к работе, но не загружены территориальные границы/геоданные»
+
+Флаг состояния:
+
+```env
+VITE_MAP_GEOMETRY_ENABLED=false
+```

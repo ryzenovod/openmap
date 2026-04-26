@@ -23,7 +23,7 @@ export default function App() {
       <Route
         path="/charts"
         element={
-          <Layout healthStatus={healthStatus} summary={<div>Charts summary</div>}>
+          <Layout healthStatus={healthStatus}>
             <ChartsPage />
           </Layout>
         }
@@ -31,7 +31,7 @@ export default function App() {
       <Route
         path="/cases"
         element={
-          <Layout healthStatus={healthStatus} summary={<div>Cases list</div>}>
+          <Layout healthStatus={healthStatus}>
             <CasesPage />
           </Layout>
         }
@@ -39,7 +39,7 @@ export default function App() {
       <Route
         path="/cases/:id"
         element={
-          <Layout healthStatus={healthStatus} summary={<div>Case details</div>}>
+          <Layout healthStatus={healthStatus}>
             <CaseDetailsPage />
           </Layout>
         }

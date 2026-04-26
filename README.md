@@ -4,8 +4,6 @@
 
 ## Запуск Docker Compose с нуля
 
-Рекомендуемая последовательность (особенно после изменения `docker-compose.yml`):
-
 ```bash
 docker compose down --remove-orphans
 docker compose up --build
@@ -16,91 +14,69 @@ docker compose up --build
 - Backend API: http://localhost:8000
 - Health: http://localhost:8000/health
 
-> База данных в compose не публикуется на хост. Backend подключается к БД внутри сети compose по `db:5432`.
+## Frontend: redesign + локализация
 
----
+В этой итерации frontend переведён на русский и визуально переработан:
+- современный спокойный layout (навигация, фильтры, карта, инфо-панель);
+- единая i18n-структура через `react-i18next`;
+- пустые и ошибочные состояния на русском;
+- backend-статус скрыт из обычного режима и доступен только в debug.
 
-## Устойчивый startup API
+### Debug mode frontend
 
-`api` стартует в порядке:
-1. ожидание DNS для `db`;
-2. ожидание подключения к Postgres (`db:5432`);
-3. `alembic upgrade head`;
-4. запуск `uvicorn`.
+```env
+# frontend/.env
+VITE_DEBUG_MODE=true
+```
 
-Важно: если `alembic upgrade` завершается ошибкой, backend контейнер **не продолжает** запуск `uvicorn` (fail fast).
+### Legacy tiles
 
----
+```env
+# frontend/.env
+VITE_LEGACY_TILE_URL=http://localhost:8080/tiles/{z}/{x}/{y}.png
+```
 
-## Если frontend пишет `backend unreachable`
+Если переменная не задана, используется OpenStreetMap.
 
-Проверьте по шагам:
+### Геометрия территорий
 
-1. Backend действительно поднят и отвечает:
-   - откройте `http://localhost:8000/health`;
-2. В логах backend нет ошибки миграций (`alembic upgrade head`);
-3. Нет CORS-проблемы preflight.
+В репозитории не обнаружены готовые GeoJSON/polygon-границы для полноценного choropleth.
+Поэтому при отсутствии подключённых геоданных frontend честно показывает состояние:
 
-### Частый симптом CORS: preflight `OPTIONS` возвращает `405`
+> «Карта готова к работе, но не загружены территориальные границы/геоданные»
 
-Если в браузере видно `OPTIONS ... 405` для `/health`, `/api/v1/map/aggregate`, `/api/v1/charts/*`, `/api/v1/cases`, значит preflight блокируется.
+Флаг:
 
-В этой версии backend настроен с `CORSMiddleware` для localhost dev origins, и preflight-запросы должны проходить корректно.
+```env
+VITE_MAP_GEOMETRY_ENABLED=false
+```
 
 ---
 
 ## Troubleshooting
 
-### 1) Занят порт 8000
+### Занят порт 8000
 
 Симптом: ошибка bind на `0.0.0.0:8000`.
 
-Что делать:
-1. Освободить порт процессом, который его занимает.
-2. Либо поменять publish-порт сервиса `api` в `docker-compose.yml` (например `8001:8000`).
+Решение:
+- освободить порт;
+- или поменять publish-порт `api` в `docker-compose.yml`.
 
-### 2) `failed to resolve host 'db'`
+### `failed to resolve host 'db'`
 
 Симптом: API не может резолвить hostname `db`.
 
-Что делать:
-1. Убедиться, что API запущен через compose, а не локально вне сети compose.
-2. Полностью перезапустить стек:
+Решение:
 
 ```bash
 docker compose down --remove-orphans
 docker compose up --build
 ```
 
-### 3) Orphan containers
-
-Симптом: после правок compose появляются странные конфликты сервисов/сетей.
-
-Что делать:
+### Orphan containers
 
 ```bash
 docker compose down --remove-orphans
 docker compose up --build
-```
-
----
-
-## Команды разработки
-
-### Backend
-```bash
-make lint
-make test
-make ci
-make migrate
-make seed
-```
-
-### Frontend
-```bash
-cd frontend
-npm run lint
-npm run test
-npm run build
-npm run dev
 ```
