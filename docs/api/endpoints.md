@@ -1,4 +1,4 @@
-# API endpoints
+# API endpoints (iteration 3)
 
 ## System
 - GET /health
@@ -22,3 +22,11 @@
 - GET /api/v1/map/aggregate
 - GET /api/v1/charts/yearly
 - GET /api/v1/charts/structure
+
+## Not in this iteration
+- frontend
+- auth provider
+- forecasting
+- AI
+- background jobs
+- external integrations
