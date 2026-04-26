@@ -28,52 +28,13 @@ services:
       test:
         [
           "CMD-SHELL",
-          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\"",
+          "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")'",
         ]
       interval: 10s
       timeout: 5s
       retries: 10
-    command: |
-      sh -c '
-      python - <<"PY"
-      import socket
-      import sys
-      import time
-
-      for i in range(60):
-          try:
-              socket.gethostbyname("db")
-              break
-          except Exception as exc:
-              print(f"[wait-dns] db not resolvable yet ({exc}), retry {i+1}/60")
-              time.sleep(1)
-      else:
-          sys.exit("db DNS resolution failed after 60s")
-      PY
-
-      python - <<"PY"
-      import sys
-      import time
-
-      import psycopg
-
-      for i in range(60):
-          try:
-              with psycopg.connect(
-                  "postgresql://postgres:postgres@db:5432/openmap",
-                  connect_timeout=2,
-              ):
-                  break
-          except Exception as exc:
-              print(f"[wait-db] db is not ready yet ({exc}), retry {i+1}/60")
-              time.sleep(1)
-      else:
-          sys.exit("db connection failed after 60s")
-      PY
-
-      alembic upgrade head
-      uvicorn app.main:app --host 0.0.0.0 --port 8000
-      '
+    command: >
+      sh -c "python -m app.scripts.wait_for_db && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
   frontend:
     image: node:20-alpine
