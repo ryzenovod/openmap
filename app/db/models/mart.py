@@ -57,7 +57,9 @@ class MartChartYearly(Base):
 class MartChartStructure(Base):
     __tablename__ = "mart_chart_structure"
     __table_args__ = (
-        UniqueConstraint("year", "dimension", "bucket", "territory_id", name="uq_mart_chart_structure_key"),
+        UniqueConstraint(
+            "year", "dimension", "bucket", "territory_id", name="uq_mart_chart_structure_key"
+        ),
         {"schema": "mart"},
     )
 

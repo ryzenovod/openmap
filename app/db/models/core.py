@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 
 from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
@@ -150,10 +150,18 @@ class MedicalCase(Base):
     diagnosis_raw: Mapped[str] = mapped_column(Text, nullable=False)
     work_raw: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    gdu_code: Mapped[str | None] = mapped_column(ForeignKey("core.dict_case_status_gdu.code"), nullable=True)
-    cv_code: Mapped[str | None] = mapped_column(ForeignKey("core.dict_sign_status.code"), nullable=True)
-    mbt_code: Mapped[str | None] = mapped_column(ForeignKey("core.dict_sign_status.code"), nullable=True)
-    case_type_code: Mapped[str | None] = mapped_column(ForeignKey("core.dict_case_type.code"), nullable=True)
+    gdu_code: Mapped[str | None] = mapped_column(
+        ForeignKey("core.dict_case_status_gdu.code"), nullable=True
+    )
+    cv_code: Mapped[str | None] = mapped_column(
+        ForeignKey("core.dict_sign_status.code"), nullable=True
+    )
+    mbt_code: Mapped[str | None] = mapped_column(
+        ForeignKey("core.dict_sign_status.code"), nullable=True
+    )
+    case_type_code: Mapped[str | None] = mapped_column(
+        ForeignKey("core.dict_case_type.code"), nullable=True
+    )
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 

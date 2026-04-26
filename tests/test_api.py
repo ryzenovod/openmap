@@ -19,28 +19,33 @@ def test_territories_and_tree(client, db_session) -> None:
     )
     db_session.commit()
 
-    flat = client.get("/api/v1/territories")
+    flat = client.get("/api/v1/territories?limit=10&offset=0&sort_by=id&sort_order=asc")
     tree = client.get("/api/v1/territories/tree")
 
     assert flat.status_code == 200
-    assert len(flat.json()) == 3
+    assert len(flat.json()["data"]) == 3
+    assert flat.json()["meta"]["count"] == 3
     assert tree.status_code == 200
-    assert tree.json()[0]["children"][0]["children"][0]["name"] == "City"
+    assert tree.json()["data"][0]["children"][0]["children"][0]["name"] == "City"
 
 
 def test_imports_endpoint(client) -> None:
-    payload = "nrec,addr,razdel,fio,godr,dreg,gdu,cv,mbt,work,diagnoz,found,address,shirota,dolgota\n1001,Addr,A,IVANOV,1985,23.04.2025,IА+,+,-,work,A15.0,1,Addr,,\n"
+    payload = (
+        "nrec,addr,razdel,fio,godr,dreg,gdu,cv,mbt,work,diagnoz,found,address,shirota,dolgota\n"
+        "1001,Addr,A,IVANOV,1985,23.04.2025,IА+,+,-,work,A15.0,1,Addr,,\n"
+    )
 
     response = client.post(
         "/api/v1/imports/cases",
         files={"file": ("sample.csv", payload.encode("utf-8"), "text/csv")},
+        headers={"X-Role": "doctor"},
     )
     assert response.status_code == 200
-    assert response.json()["success_rows"] == 1
+    assert response.json()["data"]["success_rows"] == 1
 
     imports = client.get("/api/v1/imports")
     assert imports.status_code == 200
-    assert len(imports.json()) == 1
+    assert len(imports.json()["data"]) == 1
 
 
 def test_mkb10_and_cases_endpoints(client, db_session) -> None:
@@ -49,11 +54,11 @@ def test_mkb10_and_cases_endpoints(client, db_session) -> None:
 
     mkb = client.get("/api/v1/dictionaries/mkb10")
     assert mkb.status_code == 200
-    assert mkb.json()[0]["code"] == "A00"
+    assert mkb.json()["data"][0]["code"] == "A00"
 
     cases = client.get("/api/v1/cases")
     assert cases.status_code == 200
-    if cases.json():
-        case_id = cases.json()[0]["id"]
+    if cases.json()["data"]:
+        case_id = cases.json()["data"][0]["id"]
         detail = client.get(f"/api/v1/cases/{case_id}")
         assert detail.status_code == 200

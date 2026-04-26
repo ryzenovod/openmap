@@ -163,7 +163,9 @@ def _ensure_patient_address(db: Session, patient_id: int, address_id: int) -> No
         db.add(PatientAddress(patient_id=patient_id, address_id=address_id))
 
 
-def _ensure_case_location(db: Session, case_id: int, address_id: int, role_code: str = "residence") -> None:
+def _ensure_case_location(
+    db: Session, case_id: int, address_id: int, role_code: str = "residence"
+) -> None:
     db.flush()
     existing = db.execute(
         select(CaseLocation).where(
@@ -171,7 +173,11 @@ def _ensure_case_location(db: Session, case_id: int, address_id: int, role_code:
         )
     ).scalar_one_or_none()
     if not existing:
-        db.add(CaseLocation(medical_case_id=case_id, address_id=address_id, location_role_code=role_code))
+        db.add(
+            CaseLocation(
+                medical_case_id=case_id, address_id=address_id, location_role_code=role_code
+            )
+        )
 
 
 def import_cases_csv(db: Session, filename: str, payload_bytes: bytes) -> ImportSummary:
@@ -193,7 +199,9 @@ def import_cases_csv(db: Session, filename: str, payload_bytes: bytes) -> Import
             if not fio_raw:
                 raise ValueError("fio is empty")
 
-            birth_year = int(str(row.get("godr", "")).strip()) if str(row.get("godr", "")).strip() else None
+            birth_year = (
+                int(str(row.get("godr", "")).strip()) if str(row.get("godr", "")).strip() else None
+            )
             gdu_code = str(row.get("gdu", "")).strip().replace('"', "") or None
             cv_code = map_sign_code(str(row.get("cv", "")))
             mbt_code = map_sign_code(str(row.get("mbt", "")))
@@ -271,4 +279,6 @@ def import_cases_csv(db: Session, filename: str, payload_bytes: bytes) -> Import
     batch.error_rows = errors
 
     db.commit()
-    return ImportSummary(batch_id=batch.id, total_rows=total, success_rows=success, error_rows=errors)
+    return ImportSummary(
+        batch_id=batch.id, total_rows=total, success_rows=success, error_rows=errors
+    )

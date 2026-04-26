@@ -8,7 +8,9 @@ from app.db.models.core import MedicalCase, Patient, PopulationStat, Territory
 def _seed(db_session):
     db_session.add_all(
         [
-            Territory(id=1, name="Российская Федерация", parent_id=None, territory_type_code="country"),
+            Territory(
+                id=1, name="Российская Федерация", parent_id=None, territory_type_code="country"
+            ),
             Territory(id=2, name="Приморский край", parent_id=1, territory_type_code="region"),
             Territory(id=10, name="Находка", parent_id=2, territory_type_code="municipality"),
         ]
@@ -37,22 +39,22 @@ def test_map_aggregate_api(client, db_session):
     _seed(db_session)
     response = client.get("/api/v1/map/aggregate?date_from=2025-01-01&date_to=2025-12-31")
     assert response.status_code == 200
-    assert response.json()
-    assert "incidence_per_100k" in response.json()[0]
+    assert response.json()["data"]
+    assert "incidence_per_100k" in response.json()["data"][0]
 
 
 def test_charts_yearly_api(client, db_session):
     _seed(db_session)
     response = client.get("/api/v1/charts/yearly")
     assert response.status_code == 200
-    assert response.json()[0]["year"] == 2025
+    assert response.json()["data"][0]["year"] == 2025
 
 
 def test_charts_structure_api(client, db_session):
     _seed(db_session)
     response = client.get("/api/v1/charts/structure")
     assert response.status_code == 200
-    payload = response.json()
+    payload = response.json()["data"]
     assert "by_mkb" in payload
     assert "by_sex" in payload
     assert "by_age_group" in payload

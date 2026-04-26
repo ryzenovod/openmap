@@ -1,90 +1,71 @@
 # Медгеосистема
 
-Backend внутренней медицинской геоаналитической системы (итерация 3 MVP).
+Backend-first medical geo analytics service (iteration 4 MVP).
 
-## Реализовано
-- FastAPI backend + `GET /health`
-- SQLAlchemy модели для `staging`, `core`, `mart`
-- Alembic migrations:
-  - `20260426_0001`: PostGIS + schemas
-  - `20260426_0002`: таблицы staging/core
-  - `20260426_0003`: таблицы mart + индексы
-- Seed scripts:
-  - `legacy_assets/dictionaries/mkb10Codes.csv`
-  - `legacy_assets/dictionaries/territories.csv`
-  - `legacy_assets/dictionaries/populations.csv`
-  - справочники статусов (`gdu/cv/mbt/found/case_type/location_role`)
-- Importer MVP для synthetic CSV:
-  - import batch + raw rows
-  - validation/date normalization
-  - dictionary mapping
-  - conservative dedup v0.1
-  - row-level errors
-- Aggregate services (mart-backed):
-  - map aggregates: территория, период, case/cv+/mbt+, children count, incidence per 100k, level filter
-  - chart aggregates: yearly dynamics, structure by MKB, structure by sex, structure by age group, territorial comparison
-- API endpoints:
-  - `POST /api/v1/imports/cases`
-  - `GET /api/v1/imports`
-  - `GET /api/v1/dictionaries/mkb10`
-  - `GET /api/v1/territories`
-  - `GET /api/v1/territories/tree`
-  - `GET /api/v1/cases`
-  - `GET /api/v1/cases/{id}`
-  - `GET /api/v1/map/aggregate`
-  - `GET /api/v1/charts/yearly`
-  - `GET /api/v1/charts/structure`
-- Tests:
-  - importer/date normalization/dictionary mapping/dedup
-  - aggregate services
-  - API tests for `/health`, `/territories`, `/imports`, `/api/v1/map/aggregate`, `/api/v1/charts/yearly`, `/api/v1/charts/structure`
+## Implemented
+- FastAPI backend and healthcheck (`GET /health`)
+- `staging` / `core` / `mart` SQLAlchemy models
+- Alembic migrations `0001..0003`
+- Seed scripts for dictionaries and reference statuses
+- CSV importer MVP with normalization, mapping, conservative dedup, row-level errors
+- Aggregation services and endpoints for map/charts
+- Role/access skeleton (stub): `admin`, `analyst`, `doctor`, `manager`, `viewer`
+- Unified error response layer (`error.code/message/details`)
+- Unified API style for pagination/sorting/filter DTOs and response envelopes where applicable
+- Dev workflow tooling: `Makefile`, `.pre-commit-config.yaml`, `ruff`/`black`
+- CI workflow: install, lint, tests, compile/import smoke
 
-## Пока не реализовано
+## Not implemented (by design)
 - frontend
-- auth provider
+- production auth provider
 - forecasting
 - AI
 - background jobs
 - external integrations
 
-## Быстрый старт
+## Quickstart (Docker)
 ```bash
 docker compose up --build
 ```
 
-API будет доступен на `http://localhost:8000`.
-
-## Локальная разработка
+## Local dev (without Docker)
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
 pip install -e .[dev]
 
-# применить миграции
-alembic upgrade head
-
-# загрузить словари
-python -m app.scripts.seed
-
-# запустить API
-uvicorn app.main:app --reload
+make migrate
+make seed
+make run
 ```
 
-## Импорт synthetic CSV
+## Commands reference
 ```bash
-curl -X POST "http://localhost:8000/api/v1/imports/cases" \
-  -F "file=@samples/csv/cases_sample.csv"
+make install   # install project with dev deps
+make run       # run FastAPI in reload mode
+make test      # run pytest
+make lint      # ruff + black --check
+make format    # autofix formatting
+make migrate   # alembic upgrade head
+make seed      # load dictionaries
+make ci        # compile + lint + tests
 ```
 
-## Aggregates
+## Role stub usage
+- Optional header: `X-Role`
+- Allowed values: `admin|analyst|doctor|manager|viewer`
+- No token/user integration yet (stub only)
+
+## API examples
 ```bash
-curl "http://localhost:8000/api/v1/map/aggregate?date_from=2025-01-01&date_to=2025-12-31"
-curl "http://localhost:8000/api/v1/charts/yearly"
-curl "http://localhost:8000/api/v1/charts/structure"
+curl -H "X-Role: analyst" "http://localhost:8000/api/v1/charts/yearly?date_from=2025-01-01&date_to=2025-12-31"
+curl -H "X-Role: viewer" "http://localhost:8000/api/v1/territories?limit=20&offset=0&sort_by=name&sort_order=asc"
 ```
 
-## Тесты
+## Tests
 ```bash
 pytest
+pytest -q tests/test_importer.py
+pytest -q tests/test_api.py tests/test_api_aggregates.py
 ```

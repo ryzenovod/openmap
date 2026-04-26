@@ -57,7 +57,9 @@ def aggregate_map(
     cases = db.execute(query).scalars().all()
 
     daily = defaultdict(lambda: {"case_count": 0, "mbt_positive_count": 0, "cv_positive_count": 0})
-    monthly = defaultdict(lambda: {"case_count": 0, "mbt_positive_count": 0, "cv_positive_count": 0})
+    monthly = defaultdict(
+        lambda: {"case_count": 0, "mbt_positive_count": 0, "cv_positive_count": 0}
+    )
 
     territory_by_id = {t.id: t for t in territories}
 

@@ -20,7 +20,9 @@ def _resolve_territory_id(case: MedicalCase, territories: list[Territory]) -> in
     return 2 if territories else None
 
 
-def yearly_dynamics(db: Session, date_from: date | None = None, date_to: date | None = None) -> list[dict]:
+def yearly_dynamics(
+    db: Session, date_from: date | None = None, date_to: date | None = None
+) -> list[dict]:
     query = select(MedicalCase)
     if date_from:
         query = query.where(MedicalCase.registration_date >= date_from)
@@ -107,5 +109,7 @@ def charts_structure(
         "by_mkb": structure_breakdown(db, "mkb", date_from=date_from, date_to=date_to),
         "by_sex": structure_breakdown(db, "sex", date_from=date_from, date_to=date_to),
         "by_age_group": structure_breakdown(db, "age_group", date_from=date_from, date_to=date_to),
-        "territorial_comparison": structure_breakdown(db, "territory", date_from=date_from, date_to=date_to),
+        "territorial_comparison": structure_breakdown(
+            db, "territory", date_from=date_from, date_to=date_to
+        ),
     }

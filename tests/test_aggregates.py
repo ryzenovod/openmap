@@ -10,7 +10,9 @@ from app.services.aggregates.map import aggregate_map
 def _seed_base(db_session):
     db_session.add_all(
         [
-            Territory(id=1, name="Российская Федерация", parent_id=None, territory_type_code="country"),
+            Territory(
+                id=1, name="Российская Федерация", parent_id=None, territory_type_code="country"
+            ),
             Territory(id=2, name="Приморский край", parent_id=1, territory_type_code="region"),
             Territory(id=10, name="Находка", parent_id=2, territory_type_code="municipality"),
         ]

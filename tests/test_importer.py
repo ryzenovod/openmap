@@ -5,7 +5,12 @@ from sqlalchemy.orm import Session
 
 from app.db.models.core import MedicalCase, Patient
 from app.db.models.staging import StgCaseRow
-from app.services.importer import import_cases_csv, map_geocode_status, map_sign_code, normalize_date
+from app.services.importer import (
+    import_cases_csv,
+    map_geocode_status,
+    map_sign_code,
+    normalize_date,
+)
 
 
 def test_date_normalization() -> None:
@@ -22,7 +27,11 @@ def test_dictionary_mapping() -> None:
 
 
 def test_importer_and_dedup(db_session: Session) -> None:
-    payload = """nrec,addr,razdel,fio,godr,dreg,gdu,cv,mbt,work,diagnoz,found,address,shirota,dolgota\n1001,Addr 1,A,IVANOV IVAN,1985,23.04.2025,IА+,+,-,work,A15.0 TB,1,Addr 1,,\n1001,Addr 1,A,IVANOV IVAN,1985,2025-04-23,IА+,+,-,work,A15.0 TB,1,Addr 1,,\n""".encode("utf-8")
+    payload = (
+        "nrec,addr,razdel,fio,godr,dreg,gdu,cv,mbt,work,diagnoz,found,address,shirota,dolgota\n"
+        "1001,Addr 1,A,IVANOV IVAN,1985,23.04.2025,IА+,+,-,work,A15.0 TB,1,Addr 1,,\n"
+        "1001,Addr 1,A,IVANOV IVAN,1985,2025-04-23,IА+,+,-,work,A15.0 TB,1,Addr 1,,\n"
+    ).encode()
 
     summary = import_cases_csv(db_session, filename="cases.csv", payload_bytes=payload)
 
@@ -40,7 +49,10 @@ def test_importer_and_dedup(db_session: Session) -> None:
 
 
 def test_importer_row_error(db_session: Session) -> None:
-    payload = """nrec,addr,razdel,fio,godr,dreg,gdu,cv,mbt,work,diagnoz,found,address,shirota,dolgota\n1002,Addr 2,A,PETROVA,1992,bad-date,IБ-,-,?,work,A16.2 TB,?,Addr 2,,\n""".encode("utf-8")
+    payload = (
+        "nrec,addr,razdel,fio,godr,dreg,gdu,cv,mbt,work,diagnoz,found,address,shirota,dolgota\n"
+        "1002,Addr 2,A,PETROVA,1992,bad-date,IБ-,-,?,work,A16.2 TB,?,Addr 2,,\n"
+    ).encode()
 
     summary = import_cases_csv(db_session, filename="cases_bad.csv", payload_bytes=payload)
     rows = db_session.execute(select(StgCaseRow)).scalars().all()

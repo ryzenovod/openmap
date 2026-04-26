@@ -90,8 +90,19 @@ def seed_territories() -> None:
                     continue
                 territory_id = int(row[0])
                 parent_id = int(row[2]) if len(row) > 2 and row[2] else None
-                ttype = "country" if territory_id == 1 else ("region" if territory_id == 2 else "municipality")
-                db.add(Territory(id=territory_id, parent_id=parent_id, name=row[1].strip(), territory_type_code=ttype))
+                ttype = (
+                    "country"
+                    if territory_id == 1
+                    else ("region" if territory_id == 2 else "municipality")
+                )
+                db.add(
+                    Territory(
+                        id=territory_id,
+                        parent_id=parent_id,
+                        name=row[1].strip(),
+                        territory_type_code=ttype,
+                    )
+                )
         db.commit()
     finally:
         db.close()

@@ -1,16 +1,18 @@
-# Import + aggregation flow (iteration 3 MVP)
+# Import + aggregation flow (iteration 4 MVP)
 
-1. Пользователь загружает synthetic CSV через `POST /api/v1/imports/cases`.
-2. Создаётся запись в `staging.stg_import_batch`.
-3. Каждая строка пишется в `staging.stg_case_row` как `raw_payload`.
-4. Выполняются проверки и нормализация:
-   - даты (`dd.mm.yyyy` и `yyyy-mm-dd`)
-   - маппинг `gdu/cv/mbt/found` в словари
-5. Выполняется conservative deduplication v0.1:
-   - patient: `fio_norm + birth_year`
-   - medical_case: `patient_id + registration_date + diagnosis_raw + legacy_case_num`
-6. Пишутся сущности `patient/address/medical_case/case_location`.
-7. Ошибки строки сохраняются в `error_text` в `staging.stg_case_row`.
-8. По запросу aggregate endpoints пересчитывают mart-слой:
-   - карта: `mart_case_map_daily`, `mart_case_map_monthly`
-   - графики: `mart_chart_yearly`, `mart_chart_structure`
+1. Client uploads synthetic CSV to `POST /api/v1/imports/cases`.
+2. API validates request-level constraints (file exists, CSV extension).
+3. `staging.stg_import_batch` is created.
+4. Every CSV row is stored in `staging.stg_case_row.raw_payload`.
+5. Per-row pipeline:
+   - date normalization (`dd.mm.yyyy` / `yyyy-mm-dd`)
+   - mapping legacy values `gdu/cv/mbt/found`
+   - conservative dedup:
+     - patient: `fio_norm + birth_year`
+     - case: `patient_id + registration_date + diagnosis_raw + legacy_case_num`
+   - write/update `core.patient`, `core.address`, `core.medical_case`, `core.case_location`
+6. Row errors are captured in `staging.stg_case_row.error_text`.
+7. Batch counters are finalized (`total_rows/success_rows/error_rows`).
+8. Aggregate endpoints recompute mart slices on request:
+   - map: `mart_case_map_daily`, `mart_case_map_monthly`
+   - charts: `mart_chart_yearly`, `mart_chart_structure`
