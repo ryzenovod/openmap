@@ -1,24 +1,29 @@
-# API endpoints
+# API endpoints (iteration 5)
 
-## System
+## Access stub
+- Header `X-Role` optional: `admin|analyst|doctor|manager|viewer`
+- Default role: `viewer`
+
+## Envelope conventions
+- Success envelope for most business endpoints:
+  - `data`
+  - `meta` (optional)
+- Error envelope:
+  - `error.code`
+  - `error.message`
+  - `error.details`
+
+## Endpoints used by frontend MVP
 - GET /health
-
-## Imports
-- POST /api/v1/imports/cases
-- GET /api/v1/imports
-
-## Dictionaries
-- GET /api/v1/dictionaries/mkb10
-
-## Territories
-- GET /api/v1/territories
-- GET /api/v1/territories/tree
-
-## Cases
-- GET /api/v1/cases
-- GET /api/v1/cases/{id}
-
-## Aggregates
 - GET /api/v1/map/aggregate
+  - query currently used by UI: `date_from`, `date_to`, `level`
 - GET /api/v1/charts/yearly
 - GET /api/v1/charts/structure
+- GET /api/v1/cases
+  - query currently used by UI: `limit`, `offset`, `sort_by`, `sort_order`
+- GET /api/v1/cases/{id}
+- GET /api/v1/territories
+- GET /api/v1/territories/tree
+- GET /api/v1/dictionaries/mkb10
+- POST /api/v1/imports/cases
+- GET /api/v1/imports
