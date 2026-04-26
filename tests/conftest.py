@@ -31,6 +31,7 @@ def db_session() -> Generator[Session, None, None]:
     with engine.connect() as conn:
         conn.execute(text("ATTACH DATABASE ':memory:' AS core"))
         conn.execute(text("ATTACH DATABASE ':memory:' AS staging"))
+        conn.execute(text("ATTACH DATABASE ':memory:' AS mart"))
     Base.metadata.create_all(bind=engine)
 
     SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)

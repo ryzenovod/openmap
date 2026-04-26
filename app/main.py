@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.v1.aggregates import router as aggregates_router
 from app.api.v1.cases import router as cases_router
 from app.api.v1.dictionaries import router as dictionaries_router
 from app.api.v1.health import router as health_router
@@ -13,3 +14,4 @@ app.include_router(imports_router)
 app.include_router(dictionaries_router)
 app.include_router(territories_router)
 app.include_router(cases_router)
+app.include_router(aggregates_router)

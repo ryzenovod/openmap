@@ -16,6 +16,7 @@ from app.db.models.core import (
     Territory,
 )
 from app.db.models.staging import StgCaseRow, StgFileMapping, StgImportBatch
+from app.db.models.mart import MartCaseMapDaily, MartCaseMapMonthly, MartChartStructure, MartChartYearly
 
 __all__ = [
     "Address",
@@ -36,4 +37,8 @@ __all__ = [
     "StgCaseRow",
     "StgFileMapping",
     "StgImportBatch",
+    "MartCaseMapDaily",
+    "MartCaseMapMonthly",
+    "MartChartYearly",
+    "MartChartStructure",
 ]

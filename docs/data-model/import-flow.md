@@ -1,4 +1,4 @@
-# Import flow (iteration 2 MVP)
+# Import + aggregation flow (iteration 3 MVP)
 
 1. Пользователь загружает synthetic CSV через `POST /api/v1/imports/cases`.
 2. Создаётся запись в `staging.stg_import_batch`.
@@ -11,3 +11,6 @@
    - medical_case: `patient_id + registration_date + diagnosis_raw + legacy_case_num`
 6. Пишутся сущности `patient/address/medical_case/case_location`.
 7. Ошибки строки сохраняются в `error_text` в `staging.stg_case_row`.
+8. По запросу aggregate endpoints пересчитывают mart-слой:
+   - карта: `mart_case_map_daily`, `mart_case_map_monthly`
+   - графики: `mart_chart_yearly`, `mart_chart_structure`
