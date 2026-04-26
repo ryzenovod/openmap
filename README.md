@@ -2,30 +2,23 @@
 
 Внутренний backend-first проект медицинской геоаналитики.
 
-## Что в репозитории сейчас
+## Что есть в репозитории
 
 ### Backend
 - FastAPI API (`/health`, imports, dictionaries, territories, cases, aggregates)
 - Слои данных `staging` / `core` / `mart`
-- Alembic миграции (`0001..0003`)
+- Alembic миграции
 - Seed-скрипты словарей
 - MVP importer CSV
-- MVP aggregate services (map/charts)
 - Тесты (`pytest`)
 
 ### Frontend
 - Отдельное приложение в `frontend/` (TypeScript + React + Vite + Leaflet)
-- MVP страницы:
-  - карта + фильтры + summary
-  - графики
-  - cases list + case details
-- Базовый API client с поддержкой backend error envelope
+- MVP страницы: карта, графики, список cases
 
 ---
 
-## Быстрый старт одной командой (рекомендуется)
-
-Поднимает весь стек: **db + backend + frontend**.
+## Режим 1: запуск одной командой через Docker Compose (рекомендуется)
 
 ```bash
 docker compose up --build
@@ -34,26 +27,47 @@ docker compose up --build
 После запуска:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8000
-- Health: http://localhost:8000/health
-- Postgres/PostGIS: localhost:5432
+- Health endpoint: http://localhost:8000/health
+- PostgreSQL на хосте: `localhost:5433` (в контейнерной сети backend подключается к `db:5432`)
+
+### Примечание для Apple Silicon (M1/M2/M3)
+
+Если у вас warning про platform mismatch для образов, запустите compose так:
+
+```bash
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up --build
+```
+
+Используйте это только при необходимости; на большинстве окружений текущий запуск работает без дополнительных флагов.
 
 ---
 
-## Альтернативный ручной запуск для разработки
+## Режим 2: ручной запуск backend/frontend для разработки
 
-### 1) Backend
+### 1) Поднять только БД в Docker
+
+```bash
+docker compose up -d db
+```
+
+БД будет доступна с хоста по `localhost:5433`.
+
+### 2) Запустить backend локально
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
 pip install -e .[dev]
 
+export OPENMAP_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5433/openmap
 make migrate
 make seed
 make run
 ```
 
-### 2) Frontend
+### 3) Запустить frontend локально
+
 ```bash
 cd frontend
 npm install
@@ -82,15 +96,6 @@ npm run test
 npm run build
 npm run dev
 ```
-
----
-
-## Переменные окружения (frontend)
-
-Файл: `frontend/.env`
-
-- `VITE_API_BASE_URL` — URL backend для браузера (по умолчанию `http://localhost:8000`)
-- `VITE_API_ROLE` — роль для access-stub заголовка `X-Role` (по умолчанию `viewer`)
 
 ---
 

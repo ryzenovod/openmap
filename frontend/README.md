@@ -1,6 +1,6 @@
 # Frontend MVP (OpenMap)
 
-Минимальный frontend для работы с текущим backend API.
+Минимальный frontend для работы с backend API.
 
 ## Стек
 - TypeScript
@@ -9,7 +9,17 @@
 - React Router
 - Leaflet (`react-leaflet`)
 
-## Быстрый запуск
+## Режим 1: запуск одной командой вместе со всем стеком
+
+Из корня репозитория:
+
+```bash
+docker compose up --build
+```
+
+После запуска frontend доступен на http://localhost:5173.
+
+## Режим 2: ручной запуск frontend для разработки
 
 ```bash
 npm install
@@ -17,7 +27,12 @@ cp .env.example .env
 npm run dev
 ```
 
-Приложение будет доступно на http://localhost:5173.
+Frontend будет доступен на http://localhost:5173.
+
+### Требования к backend в ручном режиме
+
+Frontend ожидает backend по `VITE_API_BASE_URL` (по умолчанию `http://localhost:8000`).
+Если backend запущен на другом адресе — измените `.env`.
 
 ## Скрипты
 - `npm run dev` — dev сервер с hot reload
@@ -30,12 +45,3 @@ npm run dev
 
 - `VITE_API_BASE_URL=http://localhost:8000`
 - `VITE_API_ROLE=viewer`
-
-## Запуск в составе полного стека
-Из корня репозитория:
-
-```bash
-docker compose up --build
-```
-
-В этом режиме frontend также запускается в dev-контейнере с volume mount для кода.
