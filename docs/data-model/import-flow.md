@@ -1,13 +1,18 @@
-# Import flow
+# Import + aggregation flow (iteration 4 MVP)
 
-1. Пользователь загружает CSV
-2. Создаётся запись в stg_import_batch
-3. Каждая строка пишется в stg_case_row
-4. Выполняется валидация и нормализация
-5. Нормализованные данные загружаются в:
-   - patient
-   - address
-   - medical_case
-   - case_location
-6. Ошибки сохраняются в staging
-7. Дальше данные агрегируются в mart
+1. Client uploads synthetic CSV to `POST /api/v1/imports/cases`.
+2. API validates request-level constraints (file exists, CSV extension).
+3. `staging.stg_import_batch` is created.
+4. Every CSV row is stored in `staging.stg_case_row.raw_payload`.
+5. Per-row pipeline:
+   - date normalization (`dd.mm.yyyy` / `yyyy-mm-dd`)
+   - mapping legacy values `gdu/cv/mbt/found`
+   - conservative dedup:
+     - patient: `fio_norm + birth_year`
+     - case: `patient_id + registration_date + diagnosis_raw + legacy_case_num`
+   - write/update `core.patient`, `core.address`, `core.medical_case`, `core.case_location`
+6. Row errors are captured in `staging.stg_case_row.error_text`.
+7. Batch counters are finalized (`total_rows/success_rows/error_rows`).
+8. Aggregate endpoints recompute mart slices on request:
+   - map: `mart_case_map_daily`, `mart_case_map_monthly`
+   - charts: `mart_chart_yearly`, `mart_chart_structure`
