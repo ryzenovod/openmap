@@ -1,0 +1,6 @@
+=== important sizes ===
+172K	/Users/ryzenovod/cancerMap/app/initData
+ 20G	/Users/ryzenovod/cancerMap/public/tileserver
+ 20G	/Users/ryzenovod/cancerMap/public/tileserver/tiles
+ 20K	/Users/ryzenovod/cancerMap/public/tileserver/images
+376K	/Users/ryzenovod/cancerMap/public/tileserver/map-gen

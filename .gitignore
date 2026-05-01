@@ -1,0 +1,11 @@
+
+# Legacy heavy map tiles
+legacy_assets/tiles/
+public/tileserver/tiles/
+frontend/public/legacy-tiles/
+tiles/
+*.mbtiles
+
+# Legacy dependency garbage
+legacy_assets/**/node_modules/
+public/tileserver/node_modules/

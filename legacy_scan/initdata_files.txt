@@ -1,0 +1,8 @@
+app/initData/population.js
+app/initData/territory.js
+app/initData/.DS_Store
+app/initData/index.js
+app/initData/data.js
+app/initData/mkb10Codes_light_old.csv
+app/initData/mkb10Code.js
+app/initData/mkb10Codes_light.csv

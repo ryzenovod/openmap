@@ -1,0 +1,46 @@
+=== tileserver root ===
+total 5528
+drwxr-xr-x@  23 ryzenovod  staff   736B Apr 26 17:16 .
+drwxrwxr-x@  10 ryzenovod  staff   320B Apr 26 17:16 ..
+-rw-r--r--@   1 ryzenovod  staff   6.0K Apr 26 17:18 .DS_Store
+drwxr-xr-x@   3 ryzenovod  staff    96B Dec  7  2019 .vscode
+-rw-rw-r--@   1 ryzenovod  staff   262B Mar  1  2019 2.png
+-rw-r--r--@   1 ryzenovod  staff   2.6K Dec  8  2019 download-tiles.js
+-rw-r--r--@   1 ryzenovod  staff   4.4K Jan  6  2020 download-tiles.ts
+-rw-r--r--@   1 ryzenovod  staff   162B Dec  3  2019 file.jpg
+drwxr-xr-x@   7 ryzenovod  staff   224B Dec  8  2019 images
+-rw-r--r--@   1 ryzenovod  staff   1.6K Dec 11  2019 js.html
+-rw-r--r--@   1 ryzenovod  staff   5.0K Dec 28  2019 leaflet-heat.js
+-rw-rw-r--@   1 ryzenovod  staff   398K Nov 18  2019 leaflet-src.esm.js
+-rw-rw-r--@   1 ryzenovod  staff   757K Nov 18  2019 leaflet-src.esm.js.map
+-rw-rw-r--@   1 ryzenovod  staff   400K Nov 18  2019 leaflet-src.js
+-rw-rw-r--@   1 ryzenovod  staff   757K Nov 18  2019 leaflet-src.js.map
+-rw-rw-r--@   1 ryzenovod  staff    14K Nov 18  2019 leaflet.css
+-rw-rw-r--@   1 ryzenovod  staff   139K Nov 18  2019 leaflet.js
+-rw-rw-r--@   1 ryzenovod  staff   192K Nov 18  2019 leaflet.js.map
+drwxr-xr-x@   3 ryzenovod  staff    96B Dec  3  2019 map-gen
+drwxrwxr-x@ 196 ryzenovod  staff   6.1K Jan  2  2020 node_modules
+-rw-rw-r--@   1 ryzenovod  staff    55K Jan  2  2020 package-lock.json
+drwxrwxr-x@  23 ryzenovod  staff   736B Apr 26 17:13 tiles
+drwxrwxr-x@   3 ryzenovod  staff    96B Dec  3  2019 wget_node.png
+
+=== tileserver directories sizes ===
+4.0K	/Users/ryzenovod/cancerMap/public/tileserver/2.png
+4.0K	/Users/ryzenovod/cancerMap/public/tileserver/download-tiles.js
+4.0K	/Users/ryzenovod/cancerMap/public/tileserver/file.jpg
+4.0K	/Users/ryzenovod/cancerMap/public/tileserver/js.html
+4.0K	/Users/ryzenovod/cancerMap/public/tileserver/wget_node.png
+8.0K	/Users/ryzenovod/cancerMap/public/tileserver/download-tiles.ts
+8.0K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet-heat.js
+ 16K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet.css
+ 20K	/Users/ryzenovod/cancerMap/public/tileserver/images
+ 56K	/Users/ryzenovod/cancerMap/public/tileserver/package-lock.json
+140K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet.js
+192K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet.js.map
+376K	/Users/ryzenovod/cancerMap/public/tileserver/map-gen
+400K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet-src.esm.js
+400K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet-src.js
+760K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet-src.esm.js.map
+760K	/Users/ryzenovod/cancerMap/public/tileserver/leaflet-src.js.map
+ 68M	/Users/ryzenovod/cancerMap/public/tileserver/node_modules
+ 20G	/Users/ryzenovod/cancerMap/public/tileserver/tiles
