@@ -31,12 +31,34 @@ VITE_DEBUG_MODE=true
 
 ### Legacy tiles
 
+Legacy raster tiles подключаются как базовая подложка Leaflet через env-переменную frontend.
+По `legacy_scan/tile_sample_files.txt` фактическое расширение тайлов: `.png`, поэтому шаблон должен быть с `{y}.png`.
+
 ```env
 # frontend/.env
-VITE_LEGACY_TILE_URL=http://localhost:8080/tiles/{z}/{x}/{y}.png
+VITE_LEGACY_TILE_URL=/tileserver/tiles/{z}/{x}/{y}.png
 ```
 
-Если переменная не задана, используется OpenStreetMap.
+Если переменная не задана или tiles недоступны, карта показывает состояние:
+
+> «Локальная картографическая подложка не подключена»
+
+Полный каталог tiles весит около 20 GB, не лежит в git и не должен копироваться в репозиторий.
+Для Docker Compose используйте bind mount через пример override:
+
+```bash
+LEGACY_TILES_DIR=/Users/ryzenovod/cancerMap/public/tileserver/tiles \
+  docker compose -f docker-compose.yml -f docker-compose.override.example.yml up --build
+```
+
+Для локального запуска без Docker можно создать symlink в публичную директорию Vite:
+
+```bash
+mkdir -p frontend/public/tileserver
+ln -s /Users/ryzenovod/cancerMap/public/tileserver/tiles frontend/public/tileserver/tiles
+```
+
+Путь `frontend/public/tileserver/tiles` добавлен в `.gitignore`.
 
 ### Геометрия территорий
 

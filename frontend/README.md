@@ -38,13 +38,36 @@ VITE_DEBUG_MODE=true
 
 ## Legacy tiles
 
-Можно подключить legacy подложку через:
+Legacy raster tiles подключаются как базовая подложка Leaflet через `VITE_LEGACY_TILE_URL`.
+В `legacy_scan/tile_sample_files.txt` образцы имеют расширение `.png`, поэтому используется шаблон:
 
 ```env
-VITE_LEGACY_TILE_URL=http://localhost:8080/tiles/{z}/{x}/{y}.png
+VITE_LEGACY_TILE_URL=/tileserver/tiles/{z}/{x}/{y}.png
 ```
 
-Если переменная пуста, используется OpenStreetMap.
+Если переменная пуста или tiles не отдаются браузеру, интерфейс показывает:
+
+> «Локальная картографическая подложка не подключена»
+
+Каталог tiles не хранится в репозитории. Локально он находится вне проекта:
+
+```text
+/Users/ryzenovod/cancerMap/public/tileserver/tiles
+```
+
+Для локального `npm run dev` можно подключить его symlink:
+
+```bash
+mkdir -p public/tileserver
+ln -s /Users/ryzenovod/cancerMap/public/tileserver/tiles public/tileserver/tiles
+```
+
+Для Docker Compose используйте `docker-compose.override.example.yml` из корня проекта:
+
+```bash
+LEGACY_TILES_DIR=/Users/ryzenovod/cancerMap/public/tileserver/tiles \
+  docker compose -f docker-compose.yml -f docker-compose.override.example.yml up --build
+```
 
 ## Что нужно для полноценной тематической карты
 

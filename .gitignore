@@ -2,6 +2,7 @@
 # Legacy heavy map tiles
 legacy_assets/tiles/
 public/tileserver/tiles/
+frontend/public/tileserver/tiles
 frontend/public/legacy-tiles/
 tiles/
 *.mbtiles

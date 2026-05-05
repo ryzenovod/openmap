@@ -1,0 +1,6 @@
+services:
+  frontend:
+    environment:
+      VITE_LEGACY_TILE_URL: /tileserver/tiles/{z}/{x}/{y}.png
+    volumes:
+      - ${LEGACY_TILES_DIR:?set LEGACY_TILES_DIR to local legacy tiles directory}:/app/public/tileserver/tiles:ro
