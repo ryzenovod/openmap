@@ -18,9 +18,12 @@ export default function MapView({ rows, onSelect }: { rows: MapAggregateRow[]; o
             attribution="Локальная растровая подложка"
             url={legacyTileUrl}
             eventHandlers={{
-              tileerror: () => setTilesUnavailable(true),
+              tileerror: (e: any) => {
+                console.warn('Tile load error:', e.tile?.src)
+                setTilesUnavailable(true)
+          },
               tileload: () => setTilesUnavailable(false),
-            }}
+      }}
           />
         ) : null}
         {rows.map((row, idx) => (

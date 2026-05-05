@@ -66,8 +66,6 @@ export default function MapPage({ healthStatus }: { healthStatus: string }) {
     <LoadingView />
   ) : error ? (
     <ApiErrorView error={error} />
-  ) : rows.length === 0 ? (
-    <EmptyView text={t('common.noDataPeriod')} />
   ) : !GEOMETRY_ENABLED ? (
     <div className="space-y-3">
       <EmptyView text={t('map.readyNoGeometry')} />
@@ -75,7 +73,10 @@ export default function MapPage({ healthStatus }: { healthStatus: string }) {
       <MapView rows={rows} onSelect={setSelected} />
     </div>
   ) : (
-    <MapView rows={rows} onSelect={setSelected} />
+    <div className="space-y-3">
+      {rows.length === 0 ? <EmptyView text={t('common.noDataPeriod')} /> : null}
+      <MapView rows={rows} onSelect={setSelected} />
+    </div>
   )
 
   return (
