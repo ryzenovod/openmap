@@ -3,7 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import type { MapAggregateRow } from '../types/api'
 
-const center: [number, number] = [43.1, 131.9]
+const center: [number, number] = [43.12, 131.9]
+
+// Примерные границы Приморского края с запасом.
+// Формат Leaflet: [[southWestLat, southWestLng], [northEastLat, northEastLng]]
+const primoryeBounds: [[number, number], [number, number]] = [
+  [42.1, 130.0],
+  [48.6, 140.0],
+]
+
 const legacyTileUrl = (import.meta.env.VITE_LEGACY_TILE_URL as string | undefined)?.trim()
 
 export default function MapView({ rows, onSelect }: { rows: MapAggregateRow[]; onSelect: (r: MapAggregateRow) => void }) {
@@ -12,18 +20,31 @@ export default function MapView({ rows, onSelect }: { rows: MapAggregateRow[]; o
 
   return (
     <div className="relative overflow-hidden rounded-xl">
-      <MapContainer center={center} zoom={7} style={{ height: '560px', width: '100%' }}>
+      <MapContainer
+        center={center}
+        zoom={10}
+        minZoom={7}
+        maxZoom={19}
+        maxBounds={primoryeBounds}
+        maxBoundsViscosity={1.0}
+        style={{ height: '560px', width: '100%' }}
+      >
         {legacyTileUrl ? (
           <TileLayer
             attribution="Локальная растровая подложка"
             url={legacyTileUrl}
+            minZoom={7}
+            maxZoom={19}
+            minNativeZoom={0}
+            maxNativeZoom={19}
+            bounds={primoryeBounds}
             eventHandlers={{
               tileerror: (e: any) => {
+                // Ошибка одного тайла не означает, что вся локальная подложка недоступна.
                 console.warn('Tile load error:', e.tile?.src)
-                setTilesUnavailable(true)
-          },
+              },
               tileload: () => setTilesUnavailable(false),
-      }}
+            }}
           />
         ) : null}
         {rows.map((row, idx) => (
