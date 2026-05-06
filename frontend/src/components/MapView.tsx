@@ -5,7 +5,7 @@ import type { MapAggregateRow } from '../types/api'
 
 const center: [number, number] = [43.12, 131.9]
 
-// Примерные границы Приморского края с запасом.
+// Примерные границы Приморского края с запасом, центр во Владивостоке. Это ограничит перемещение карты за пределы региона, но позволит видеть всю его территорию.
 // Формат Leaflet: [[southWestLat, southWestLng], [northEastLat, northEastLng]]
 const primoryeBounds: [[number, number], [number, number]] = [
   [42.1, 130.0],
