@@ -16,3 +16,35 @@
 8. Aggregate endpoints recompute mart slices on request:
    - map: `mart_case_map_daily`, `mart_case_map_monthly`
    - charts: `mart_chart_yearly`, `mart_chart_structure`
+
+## Territory geometry import
+
+Territory boundaries are imported separately from medical case CSV files.
+
+Expected local path:
+
+```text
+data/boundaries/primorye_territories.geojson
+```
+
+Importer entry point:
+
+```bash
+python -m app.scripts.import_boundaries
+```
+
+Docker Compose entry point:
+
+```bash
+docker compose exec api python -m app.scripts.import_boundaries
+```
+
+The importer requires:
+- GeoJSON root `type: "FeatureCollection"`;
+- every feature must have `properties.territory_id`;
+- every feature must have `properties.territory_name`;
+- `properties.level` is optional;
+- geometry must be `Polygon` or `MultiPolygon`;
+- imported geometry is stored in SRID 4326 as `MultiPolygon`.
+
+The importer does not download data and does not generate synthetic polygons.

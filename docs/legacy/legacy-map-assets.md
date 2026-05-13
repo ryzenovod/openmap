@@ -27,9 +27,31 @@
 Автоматический поиск не нашёл GeoJSON / SHP / KML / MBTiles.
 
 Это значит:
-- legacy даёт подложку карты;
+- legacy даёт только фоновую raster-подложку карты;
 - территориальные границы районов/муниципалитетов нужно искать отдельно;
 - полноценный choropleth невозможен без territorial geometry.
+
+## Choropleth и GeoJSON
+
+Backend ожидает реальные границы в локальном файле:
+
+```text
+data/boundaries/primorye_territories.geojson
+```
+
+Минимальные требования к FeatureCollection:
+- `properties.territory_id` — основной ключ связи с агрегатами `row.territory_id`;
+- `properties.territory_name` — отображаемое имя территории;
+- `properties.level` — необязательный уровень территории;
+- `geometry.type` — `Polygon` или `MultiPolygon`, сохраняется как `geometry(MultiPolygon, 4326)`.
+
+Проверка endpoint:
+
+```bash
+curl http://localhost:8000/api/v1/map/territories.geojson
+```
+
+Если геометрии не загружены, endpoint возвращает пустой `FeatureCollection`. Frontend при этом продолжает показывать legacy raster layer и неблокирующее сообщение о том, что векторные границы пока не загружены.
 
 ## Что нужно реализовать
 

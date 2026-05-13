@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { apiErrorDiagnostics, isAbortError } from '../api/client'
 import { api } from '../api/endpoints'
 import EmptyView from '../components/EmptyView'
 import FilterPanel, { DEFAULT_FILTERS, type MapFilters } from '../components/FilterPanel'
 import LoadingView from '../components/LoadingView'
 import MapView from '../components/MapView'
-import type { MapAggregateRow } from '../types/api'
+import type { MapAggregateRow, TerritoryGeoJson } from '../types/api'
 import ApiErrorView from '../components/ApiErrorView'
 import Layout from '../components/Layout'
 
 const GEOMETRY_ENABLED = import.meta.env.VITE_MAP_GEOMETRY_ENABLED === 'true'
+const EMPTY_TERRITORY_GEOJSON: TerritoryGeoJson = { type: 'FeatureCollection', features: [] }
 
 function toQuery(filters: MapFilters): string {
   const params = new URLSearchParams()
@@ -29,18 +31,71 @@ export default function MapPage({ healthStatus }: { healthStatus: string }) {
   const [rows, setRows] = useState<MapAggregateRow[]>([])
   const [selected, setSelected] = useState<MapAggregateRow | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<unknown>(null)
+  const [aggregateError, setAggregateError] = useState<unknown>(null)
   const [filters, setFilters] = useState<MapFilters>(DEFAULT_FILTERS)
+  const [territoriesGeoJson, setTerritoriesGeoJson] = useState<TerritoryGeoJson>(
+    EMPTY_TERRITORY_GEOJSON,
+  )
+  const [vectorNotice, setVectorNotice] = useState<string | null>(null)
 
   useEffect(() => {
+    let isActive = true
+    const controller = new AbortController()
     setLoading(true)
-    setError(null)
+    setAggregateError(null)
     api
-      .mapAggregate(toQuery(filters))
-      .then((resp) => setRows(resp.data))
-      .catch(setError)
-      .finally(() => setLoading(false))
+      .mapAggregate(toQuery(filters), { signal: controller.signal })
+      .then((resp) => {
+        if (!isActive) return
+        setRows(resp.data)
+        setAggregateError(null)
+      })
+      .catch((err) => {
+        if (isAbortError(err)) return
+        console.warn('Ошибка загрузки агрегатов карты', apiErrorDiagnostics(err))
+        if (!isActive) return
+        setAggregateError(err)
+      })
+      .finally(() => {
+        if (!isActive) return
+        setLoading(false)
+      })
+
+    return () => {
+      isActive = false
+      controller.abort()
+    }
   }, [filters])
+
+  useEffect(() => {
+    if (!GEOMETRY_ENABLED) {
+      setTerritoriesGeoJson(EMPTY_TERRITORY_GEOJSON)
+      setVectorNotice(null)
+      return
+    }
+
+    let isActive = true
+    const controller = new AbortController()
+    api
+      .mapTerritoriesGeoJson({ signal: controller.signal })
+      .then((geojson) => {
+        if (!isActive) return
+        setTerritoriesGeoJson(geojson)
+        setVectorNotice(geojson.features.length === 0 ? t('map.vectorBoundariesMissing') : null)
+      })
+      .catch((err) => {
+        if (isAbortError(err)) return
+        console.warn('Ошибка загрузки GeoJSON границ', apiErrorDiagnostics(err))
+        if (!isActive) return
+        setTerritoriesGeoJson(EMPTY_TERRITORY_GEOJSON)
+        setVectorNotice(t('map.vectorBoundariesMissing'))
+      })
+
+    return () => {
+      isActive = false
+      controller.abort()
+    }
+  }, [t])
 
   const summary = useMemo(() => {
     if (!selected) {
@@ -61,21 +116,35 @@ export default function MapPage({ healthStatus }: { healthStatus: string }) {
   }, [selected, t])
 
   const totalCases = rows.reduce((acc, row) => acc + row.case_count, 0)
+  const showBlockingError = Boolean(aggregateError && rows.length === 0)
+  const aggregateWarning =
+    aggregateError && rows.length > 0 ? (
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+        {t('map.aggregateRefreshFailed')}
+      </div>
+    ) : null
 
-  const content = loading ? (
+  const content = loading && rows.length === 0 ? (
     <LoadingView />
-  ) : error ? (
-    <ApiErrorView error={error} />
+  ) : showBlockingError ? (
+    <ApiErrorView error={aggregateError} />
   ) : !GEOMETRY_ENABLED ? (
     <div className="space-y-3">
+      {aggregateWarning}
       <EmptyView text={t('map.readyNoGeometry')} />
       <p className="text-sm text-slate-500">{t('map.mapHint')}</p>
       <MapView rows={rows} onSelect={setSelected} />
     </div>
   ) : (
     <div className="space-y-3">
+      {aggregateWarning}
       {rows.length === 0 ? <EmptyView text={t('common.noDataPeriod')} /> : null}
-      <MapView rows={rows} onSelect={setSelected} />
+      <MapView
+        rows={rows}
+        territoriesGeoJson={territoriesGeoJson}
+        vectorNotice={vectorNotice}
+        onSelect={setSelected}
+      />
     </div>
   )
 

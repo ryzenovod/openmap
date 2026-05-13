@@ -25,6 +25,24 @@ export type MapAggregateRow = {
   incidence_per_100k: number | null
 }
 
+export type TerritoryGeoJsonProperties = {
+  territory_id?: number | string | null
+  territory_name?: string | null
+  level?: string | null
+  [key: string]: unknown
+}
+
+export type TerritoryGeoJsonFeature = {
+  type: 'Feature'
+  properties: TerritoryGeoJsonProperties | null
+  geometry: Record<string, unknown> | null
+}
+
+export type TerritoryGeoJson = {
+  type: 'FeatureCollection'
+  features: TerritoryGeoJsonFeature[]
+}
+
 export type YearlyRow = { year: number; case_count: number }
 
 export type StructureRow = {

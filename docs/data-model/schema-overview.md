@@ -16,6 +16,7 @@
 - dict_case_type
 - dict_location_role
 - territory
+- territory_geometry
 - population_stat
 - patient
 - address

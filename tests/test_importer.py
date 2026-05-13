@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -10,6 +11,10 @@ from app.services.importer import (
     map_geocode_status,
     map_sign_code,
     normalize_date,
+)
+from app.services.territory_geometry import (
+    TerritoryGeoJsonImportError,
+    load_territory_geojson_features,
 )
 
 
@@ -59,3 +64,26 @@ def test_importer_row_error(db_session: Session) -> None:
 
     assert summary.error_rows == 1
     assert rows[0].error_text is not None
+
+
+def test_territory_geojson_empty_feature_collection(tmp_path) -> None:
+    payload = '{"type": "FeatureCollection", "features": []}'
+    path = tmp_path / "territories.geojson"
+    path.write_text(payload, encoding="utf-8")
+
+    features = load_territory_geojson_features(path)
+
+    assert features == []
+
+
+def test_territory_geojson_missing_file(tmp_path) -> None:
+    with pytest.raises(TerritoryGeoJsonImportError, match="not found"):
+        load_territory_geojson_features(tmp_path / "missing.geojson")
+
+
+def test_territory_geojson_requires_feature_collection(tmp_path) -> None:
+    path = tmp_path / "invalid.geojson"
+    path.write_text('{"type": "Feature", "properties": {}, "geometry": null}', encoding="utf-8")
+
+    with pytest.raises(TerritoryGeoJsonImportError, match="FeatureCollection"):
+        load_territory_geojson_features(path)

@@ -7,6 +7,7 @@ WORKDIR /app
 
 COPY pyproject.toml README.md ./
 COPY app ./app
+COPY legacy_assets/dictionaries ./legacy_assets/dictionaries
 COPY alembic.ini ./
 COPY alembic ./alembic
 

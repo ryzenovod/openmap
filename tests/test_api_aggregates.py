@@ -43,6 +43,13 @@ def test_map_aggregate_api(client, db_session):
     assert "incidence_per_100k" in response.json()["data"][0]
 
 
+def test_map_territories_geojson_empty(client):
+    response = client.get("/api/v1/map/territories.geojson")
+
+    assert response.status_code == 200
+    assert response.json() == {"type": "FeatureCollection", "features": []}
+
+
 def test_charts_yearly_api(client, db_session):
     _seed(db_session)
     response = client.get("/api/v1/charts/yearly")

@@ -6,6 +6,12 @@ frontend/public/tileserver/tiles
 frontend/public/legacy-tiles/
 tiles/
 *.mbtiles
+data/boundaries/*.geojson
+data/boundaries/*.json
+data/boundaries/*.shp
+data/boundaries/*.shx
+data/boundaries/*.dbf
+data/boundaries/*.prj
 
 # Legacy dependency garbage
 legacy_assets/**/node_modules/
@@ -21,3 +27,6 @@ tiles/
 # Legacy dependency garbage
 legacy_assets/**/node_modules/
 public/tileserver/node_modules/
+
+.DS_Store
+**/.DS_Store

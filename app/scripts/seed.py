@@ -61,19 +61,35 @@ def seed_mkb10() -> None:
     db = SessionLocal()
     try:
         db.execute(delete(DictMkb10))
+        records: list[tuple[int, int | None, str, str]] = []
         with (DICT_DIR / "mkb10Codes.csv").open("r", encoding="utf-8") as handle:
             reader = csv.reader(handle, delimiter=";")
             for row in reader:
                 if not row:
                     continue
-                db.add(
-                    DictMkb10(
-                        id=int(row[0]),
-                        parent_id=int(row[1]) if row[1] else None,
-                        code=row[2].strip(),
-                        name=row[3].strip(),
+                records.append(
+                    (
+                        int(row[0]),
+                        int(row[1]) if row[1] else None,
+                        row[2].strip(),
+                        row[3].strip(),
                     )
                 )
+
+        items = {
+            row_id: DictMkb10(id=row_id, parent_id=None, code=code, name=name)
+            for row_id, _, code, name in records
+        }
+        missing_parent_ids = sorted(
+            {parent_id for _, parent_id, _, _ in records if parent_id and parent_id not in items}
+        )
+        if missing_parent_ids:
+            raise ValueError(f"mkb10 parent ids are missing: {missing_parent_ids}")
+
+        db.add_all(items.values())
+        db.flush()
+        for row_id, parent_id, _, _ in records:
+            items[row_id].parent_id = parent_id
         db.commit()
     finally:
         db.close()

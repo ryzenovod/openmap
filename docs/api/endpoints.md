@@ -17,6 +17,9 @@
 - GET /health
 - GET /api/v1/map/aggregate
   - query currently used by UI: `date_from`, `date_to`, `level`
+- GET /api/v1/map/territories.geojson
+  - returns a raw GeoJSON `FeatureCollection`, not an envelope
+  - returns `{"type":"FeatureCollection","features":[]}` when no territory geometries are loaded
 - GET /api/v1/charts/yearly
 - GET /api/v1/charts/structure
 - GET /api/v1/cases
